@@ -25,11 +25,14 @@ contract Strip {
     steth = _steth;
     expiry = _expiry;
     trackerAddr = _trackerAddr;
+    // make mint amounts equal to deposited STETH in "issue" 
     io = new IOSTeth(10000 * (10**18));
     po = new POSteth(10000 * (10**18));
     console.log(block.timestamp);
   }
 
+  
+  // replace with "issue" function
   function mint(uint _amount) external {
     // receives steth
     require(steth.transferFrom(msg.sender, address(this), _amount), "Must approve stEth transfer prior to mint!");
@@ -39,8 +42,8 @@ contract Strip {
     po.transfer(msg.sender, _amount);
   }
 
+  // unneeded 
   function redeem(uint _amount) external {
-
     // receives IOsteth and POsteth 
     require(io.transferFrom(msg.sender, address(this), _amount), "Must approve ioSteth transfer prior to redeem!");
     require(po.transferFrom(msg.sender, address(this), _amount), "Must approve poSteth transfer prior to redeem!");
@@ -49,6 +52,7 @@ contract Strip {
     steth.transfer(msg.sender, _amount);
   }
 
+  // is PO even needed for this?
   function claimPrincipal(uint _amount) external {
     // only after expiry
     require(block.timestamp >= expiry, "No PO redemption before expiry");
@@ -72,6 +76,7 @@ contract Strip {
 
   }
   
+  // Yield only at expiry?
   function claimYield() external {
     // check accrued yield
     uint yield = checkAccruedYield(msg.sender);
@@ -85,7 +90,7 @@ contract Strip {
     // sends that steth
     steth.transfer(msg.sender, yield);
   }
-
+  
   function unstakeIOAndClaim() external {
     // Make sure they have a deposit
     require(stakerDeposits[msg.sender].amount != 0, "You have no staked IO...awk");
